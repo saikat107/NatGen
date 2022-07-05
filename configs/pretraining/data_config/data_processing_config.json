@@ -1,0 +1,13 @@
+{
+  "transformers": {
+    "BlockSwap": 6,
+    "ConfusionRemover": 10,
+    "ForWhileTransformer": 2,
+    "OperandSwap": 1,
+    "SyntacticNoisingTransformation": 0,
+    "DeadCodeInserter": 1,
+    "VarRenamer": 1
+  },
+  "max_function_length": 400,
+  "bidirection_transformation": "adaptive"
+}
