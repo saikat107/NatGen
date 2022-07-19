@@ -14,6 +14,7 @@ from src.data_preprocessors.language_processors.go_processor import GoProcessor
 from src.data_preprocessors.language_processors.ruby_processor import RubyProcessor
 from src.data_preprocessors.language_processors.utils import get_tokens
 from src.data_preprocessors.transformations import TransformationBase
+import os
 
 processor_function = {
     "java": JavaAndCPPProcessor,
@@ -218,10 +219,15 @@ if __name__ == '__main__':
         "ruby": ("ruby", ruby_code),
         "go": ("go", go_code),
     }
-    for lang in ["c", "cpp", "java", "python", "php", "ruby", "js", "go", "cs"]:
+    code_directory = os.path.realpath(os.path.join(os.path.realpath(__file__), '../../../..'))
+    print(code_directory)
+    parser_path = os.path.join(code_directory, "parser/languages.so")
+    print(parser_path)
+    assert os.path.exists(parser_path), f"Parser does not exist in {parser_path}. Please run the setup.sh (setup_repo function, uncomment it if necessary) from the setup.sh in the NatGen main directory."
+    for lang in ["c", "cpp"]: #, "java", "python", "php", "ruby", "js", "go", "cs"]:
         lang, code = input_map[lang]
         var_renamer = VarRenamer(
-            "/Users/robin/Documents/researchProjects/treesitter_parser/languages.so", lang
+            parser_path, lang
         )
         print(lang)
         code, meta = var_renamer.transform_code(code)
