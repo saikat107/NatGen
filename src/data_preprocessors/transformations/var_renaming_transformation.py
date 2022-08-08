@@ -2,6 +2,7 @@ import math
 import random
 import re
 from typing import Union, Tuple
+import os
 
 from src.data_preprocessors.language_processors import (
     JavaAndCPPProcessor,
@@ -220,11 +221,8 @@ if __name__ == '__main__':
         "go": ("go", go_code),
     }
     code_directory = os.path.realpath(os.path.join(os.path.realpath(__file__), '../../../..'))
-    print(code_directory)
     parser_path = os.path.join(code_directory, "parser/languages.so")
-    print(parser_path)
-    assert os.path.exists(parser_path), f"Parser does not exist in {parser_path}. Please run the setup.sh (setup_repo function, uncomment it if necessary) from the setup.sh in the NatGen main directory."
-    for lang in ["c", "cpp"]: #, "java", "python", "php", "ruby", "js", "go", "cs"]:
+    for lang in ["c", "cpp", "java", "python", "php", "ruby", "js", "go", "cs"]:
         lang, code = input_map[lang]
         var_renamer = VarRenamer(
             parser_path, lang

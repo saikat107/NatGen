@@ -1,4 +1,5 @@
 import copy
+import os
 import re
 from typing import Union, Tuple
 
@@ -82,134 +83,98 @@ class OperandSwap(TransformationBase):
 
 if __name__ == '__main__':
     java_code = """
-
-int time = 20;
-if (time < 18 && time>20) {
-  System.out.println("Good day.");
-}
-else if(time==20){
-  System.out.println("Good noon")
-}
- else {
-  System.out.println("Good evening.");
-}
-
-
-
-    """
-    python_code = """
-    
-aa = 33
-bbb = 33
-if bbb > aa:
-  print("b is greater than a")
-elif aa == bbb:
-  print("a and b are equal")
-    
-    
-    """
-    c_code = """
- 
- int time = 20;
-if (time < 18 && time>20) {
-  System.out.println("Good day.");
-}
-else if(time==20){
-  System.out.println("Good noon")
-}
- else {
-  System.out.println("Good evening.");
-}
-
- 
- 
- 
- 
- 
-    """
-    cs_code = """
-    int foo(int n){
-            int res = 0, i = 0;
-            while(i < n) {
-                int j = 0;
-                while (j < i){
-                    res += j; 
-                }
+        void foo(){
+            int time = 20;
+            if (time < 18) {
+              time=10;
             }
-            return res;
+             else {
+              System.out.println("Good evening.");
+            }
         }
-    """
+        """
+    python_code = """
+        from typing import List
+
+        def factorize(n: int) -> List[int]:
+            import math
+            fact = []
+            i = 2
+            while i <= int(math.sqrt(n) + 1):
+                if n % i == 0:
+                    fact.append(i)
+                    n //= i
+                else:
+                    i += 1
+            if n > 1:
+                fact.append(n)
+            return fact
+        """
+    c_code = """
+        void foo(){
+            int time = 20;
+            if (time < 18) {
+              time=10;
+            }
+             else {
+              System.out.println("Good evening.");
+            }
+        }
+        """
+    cs_code = """
+        void foo(){
+            int time = 20;
+            if (time < 18) {
+              time=10;
+            }
+             else {
+              System.out.println("Good evening.");
+            }
+        }
+        """
     js_code = """function foo(n) {
-        let res = '';
-        for(let i = 0; i < 10; i++){
-            res += i.toString();
-            res += '<br>';
-        } 
-        while ( i < 10 ; ) { 
-            res += 'bk'; 
+            if (time < 10) {
+              greeting = "Good morning";
+            } 
+            else {
+              greeting = "Good evening";
+            }
         }
-        return res;
-    }
-    """
+        """
     ruby_code = """
-
-
-x = 1 
-unless x>=2
-   puts "x is less than 2"
- else
-   puts "x is greater than 2"
-end
-
-
-
-
-
+        x = 1
+        if x > 2
+           puts "x is greater than 2"   
+        else
+           puts "I can't guess the number"
+        end
         """
     go_code = """
+        func main() {
+           /* local variable definition */
+           var a int = 100;
 
-func main() {
-   /* local variable definition */
-   var a int = 100
- 
-   /* check the boolean condition */
-   if( a == 10 ) {
-      /* if condition is true then print the following */
-      fmt.Printf("Value of a is 10\n" )
-   } else if( a == 20 ) {
-      /* if else if condition is true */
-      fmt.Printf("Value of a is 20\n" )
-   } else if( a == 30 ) {
-      /* if else if condition is true  */
-      fmt.Printf("Value of a is 30\n" )
-   } else {
-      /* if none of the conditions is true */
-      fmt.Printf("None of the values is matching\n" )
-   }
-   fmt.Printf("Exact value of a is: %d\n", a )
-}
-
-
-
-
-
-
-
+           /* check the boolean condition */
+           if( a < 20 ) {
+              /* if condition is true then print the following */
+              fmt.Printf("a is less than 20\n" );
+           } else {
+              /* if condition is false then print the following */
+              fmt.Printf("a is not less than 20\n" );
+           }
+           fmt.Printf("value of a is : %d\n", a);
+        }
         """
     php_code = """
-    <?php 
-    
-    for ($x = 0; $x <= 10; $x++) {
-        echo "The number is: $x <br>";
-    }
-    $x = 0 ; 
-    while ( $x <= 10 ) { 
-        echo "The number is:  $x  <br> "; 
-        $x++; 
-    } 
-    
-    ?> 
-    """
+        <?php 
+        $t = date("H");
+        if ($t < "10") {
+          echo "Have a good morning!";
+        }  else {
+          echo "Have a good night!";
+        }
+        ?> 
+        """
     input_map = {
         "java": ("java", java_code),
         "c": ("c", c_code),
@@ -221,13 +186,15 @@ func main() {
         "ruby": ("ruby", ruby_code),
         "go": ("go", go_code),
     }
+    code_directory = os.path.realpath(os.path.join(os.path.realpath(__file__), '../../../../'))
+    parser_path = os.path.join(code_directory, "parser/languages.so")
     for lang in ["java", "python", "js", "c", "cpp", "php", "go", "ruby",
                  "cs"]:  # ["c", "cpp", "java", "cs", "python",
         # "php", "go", "ruby"]:
         # lang = "php"
         lang, code = input_map[lang]
         operandswap = OperandSwap(
-            "/parser/languages.so", lang
+            parser_path, lang
         )
         print(lang)
         # print("-" * 150)

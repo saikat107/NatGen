@@ -1,5 +1,6 @@
 import re
 from typing import Union, Tuple
+import os
 
 import numpy as np
 
@@ -219,10 +220,12 @@ if __name__ == '__main__':
         "ruby": ("ruby", ruby_code),
         "go": ("go", go_code),
     }
+    code_directory = os.path.realpath(os.path.join(os.path.realpath(__file__), '../../../../'))
+    parser_path = os.path.join(code_directory, "parser/languages.so")
     for lang in ["c", "cpp", "java", "python", "php", "ruby", "js", "go", "cs"]:
         lang, code = input_map[lang]
         dead_code_inserter = DeadCodeInserter(
-            "/parser/languages.so", lang
+            parser_path, lang
         )
         print(lang)
         code, meta = dead_code_inserter.transform_code(code)

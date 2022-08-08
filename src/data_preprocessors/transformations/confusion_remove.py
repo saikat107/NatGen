@@ -2,6 +2,7 @@ import copy
 from typing import Union, Tuple
 
 import numpy as np
+import os
 
 from src.data_preprocessors.language_processors import (
     JavaAndCPPProcessor,
@@ -176,11 +177,13 @@ if __name__ == '__main__':
         "ruby": ("ruby", ruby_code),
         "go": ("go", go_code),
     }
+    code_directory = os.path.realpath(os.path.join(os.path.realpath(__file__), '../../../../'))
+    parser_path = os.path.join(code_directory, "parser/languages.so")
     for lang in ["c", "cpp", "java", "cs", "python", "php", "go", "ruby"]:
         # lang = "php"
         lang, code = input_map[lang]
         confusion_remover = ConfusionRemover(
-            "/parser/languages.so", lang
+            parser_path, lang
         )
         print(lang)
         code, types = confusion_remover.transform_code(code)

@@ -1,4 +1,5 @@
 import copy
+import os
 import re
 from typing import Union, Tuple
 
@@ -93,15 +94,14 @@ if __name__ == '__main__':
         }
     }
     """
-    python_code = """def foo(n):
-    res = 0
-    for i in range(0, 19, 2):
-        res += i
-    i = 0
-    while i in range(n):
-        res += i
-        i += 1
-    return res
+    python_code = """
+    def is_prime(n):
+        if n < 2:
+            return False
+        for k in range(2, n - 1):
+            if n % k == 0:
+                return False
+        return True
     """
     c_code = """
         int foo(int n){
@@ -178,17 +178,15 @@ if __name__ == '__main__':
         "ruby": ("ruby", ruby_code),
         "go": ("go", go_code),
     }
-    for lang in ["java"]:  # input_map.keys():
-        # lang = "php"
+    code_directory = os.path.realpath(os.path.join(os.path.realpath(__file__), '../../../../'))
+    parser_path = os.path.join(code_directory, "parser/languages.so")
+    for lang in ["java", "python", "js", "c", "cpp", "php", "go", "ruby", "cs"]:
         lang, code = input_map[lang]
-        for_while_transformer = ForWhileTransformer(
-            "/parser/languages.so", lang
-        )
+        for_while_transformer = ForWhileTransformer(parser_path, lang)
         print(lang, end="\t")
-        # print("-" * 150)
-        # print(code)
-        # print("-" * 150)
         code, meta = for_while_transformer.transform_code(code)
+        if lang == "python":
+            code = PythonProcessor.beautify_python_code(code.split())
         print(code)
-        print(meta["success"])
+        print(meta)
         print("=" * 150)

@@ -4,7 +4,6 @@ from io import BytesIO
 from tree_sitter import Node
 
 
-
 class PythonProcessor:
     @classmethod
     def create_dead_for_loop(cls, body):
@@ -113,6 +112,8 @@ class PythonProcessor:
             pass
         if not success:
             code_string = cls.beautify_python_code(cls.get_tokens(code_string, root))
+        else:
+            code_string = cls.beautify_python_code(code_string.split())
         return root, code_string, success
 
     @classmethod
@@ -132,6 +133,8 @@ class PythonProcessor:
         #             code_string = modified_code_string
         #     if not success:
         #         code_string = cls.beautify_python_code(get_tokens(code_string, root))
+        #     else:
+        #         code_string = cls.beautify_python_code(code_string.split())
         # except:
         #     pass
         return root, code_string, False
@@ -225,12 +228,12 @@ class PythonProcessor:
                 args = []
                 for a in argument_list:
                     k = str(a.type)
-                    if k not in ["(", ","]:
+                    if k not in ["(", ",", ")"]:
                         args.append(a)
                 start, stop, step = ["0"], ["0"], ["1"]
                 if len(args) == 1:
                     stop = cls.get_tokens(code_string, args[0])
-                elif len(args) == 0:
+                elif len(args) == 2:
                     start = cls.get_tokens(code_string, args[0])
                     stop = cls.get_tokens(code_string, args[1])
                 else:
@@ -239,7 +242,8 @@ class PythonProcessor:
                     step = cls.get_tokens(code_string, args[2])
                 identifier_name = cls.get_tokens(code_string, identifier)[0]
                 while_stmt = [identifier_name, "="] + start + ["NEWLINE"] + \
-                             ["while", identifier_name, "in", "range", "("] + stop + [")", ":", "NEWLINE", "INDENT"] + \
+                             ["while", identifier_name, "in", "list", "(", "range", "("] + stop + \
+                             [")", ")", ":", "NEWLINE", "INDENT"] + \
                              cls.get_tokens(code_string, body_node) + ["NEWLINE", identifier_name, "+="] + step + \
                              ["DEDENT", "NEWLINE"]
                 tokens = cls.get_tokens_replace_for(
@@ -249,7 +253,7 @@ class PythonProcessor:
                     root=root
                 )
                 code = cls.beautify_python_code(tokens)
-                return parser.parse_code(code), code, True
+                return parser.parse_code(code), " ".join(tokens), True
         except:
             pass
         return root, code_string, False
@@ -406,6 +410,8 @@ class PythonProcessor:
             pass
         if not success:
             code_string = cls.beautify_python_code(cls.get_tokens(code_str, root))
+        else:
+            code_string = cls.beautify_python_code(code_string.split())
         return code_string, success
 
     @classmethod
@@ -493,13 +499,13 @@ class PythonProcessor:
                 tokens += ["NEWLINE", "INDENT"]
             if child.start_byte == first_block.start_byte and child.end_byte == first_block.end_byte and flagx == 0 \
                     and str(
-                    child.type) == str(first_block.type):
+                child.type) == str(first_block.type):
                 flagx = 1
                 ts, _ = cls.get_tokens_for_blockswap(code, second_block, first_block, opt_node, second_block, flagx,
                                                      flagy)
-            elif child.start_byte == second_block.start_byte and child.end_byte == second_block.end_byte and flagy ==\
+            elif child.start_byte == second_block.start_byte and child.end_byte == second_block.end_byte and flagy == \
                     0 and str(
-                    child.type) == str(second_block.type):
+                child.type) == str(second_block.type):
                 flagy = 1
                 ts, _ = cls.get_tokens_for_blockswap(code, first_block, first_block, opt_node, second_block, flagx,
                                                      flagy)
@@ -543,16 +549,16 @@ class PythonProcessor:
                     if str(current_node.type) == 'block':
                         first_block = current_node
                     elif str(current_node.type) == 'else_clause':
-                        new_list=current_node.children
+                        new_list = current_node.children
                         for w in new_list:
-                            if str(w.type) == 'block':    
+                            if str(w.type) == 'block':
                                 second_block = w
                                 break
                 flagx = 0
                 flagy = 0
                 try:
                     code_list = \
-                    cls.get_tokens_for_blockswap(code, root, first_block, opt_node, second_block, flagx, flagy)[0]
+                        cls.get_tokens_for_blockswap(code, root, first_block, opt_node, second_block, flagx, flagy)[0]
                     code_string = ""
                     for w in code_list:
                         code_string = code_string + w + " "
@@ -565,6 +571,8 @@ class PythonProcessor:
             pass
         if not success:
             code_string = cls.beautify_python_code(cls.get_tokens(code_str, root))
+        else:
+            code_string = cls.beautify_python_code(code_string.split())
         return code_string, success
 
 

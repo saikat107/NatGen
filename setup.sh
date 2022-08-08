@@ -17,8 +17,8 @@ function setup_repo() {
 }
 
 function create_and_activate() {
-    conda create --name semcode python=3.6;
-    conda activate semcode;
+    conda create --name natgen python=3.6;
+    conda activate natgen;
 }
 
 function install_deps() {

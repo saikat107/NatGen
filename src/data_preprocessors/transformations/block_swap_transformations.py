@@ -1,4 +1,5 @@
 import copy
+import os
 import re
 from typing import Union, Tuple
 
@@ -82,106 +83,96 @@ class BlockSwap(TransformationBase):
 
 if __name__ == '__main__':
     java_code = """
-
-int time = 20;
-if (time < 18) {
-  time=10;
-}
-
- else {
-  System.out.println("Good evening.");
-}
-
-
-
+    void foo(){
+        int time = 20;
+        if (time < 18) {
+          time=10;
+        }
+         else {
+          System.out.println("Good evening.");
+        }
+    }
     """
     python_code = """
-a = 200
-b = 33
-if b > a:
-  b=5
-else:
-  a=3
+    from typing import List
+    
+    def factorize(n: int) -> List[int]:
+        import math
+        fact = []
+        i = 2
+        while i <= int(math.sqrt(n) + 1):
+            if n % i == 0:
+                fact.append(i)
+                n //= i
+            else:
+                i += 1
+        if n > 1:
+            fact.append(n)
+        return fact
     """
     c_code = """
- 
- int time = 20;
-if (time < 18) {
-  System.out.println("Good day.");
-}
-else if(time==20){
-  System.out.println("Good noon")
-}
- else {
-  a=5;
-}
-
- 
- 
- 
- 
- 
+    void foo(){
+        int time = 20;
+        if (time < 18) {
+          time=10;
+        }
+         else {
+          System.out.println("Good evening.");
+        }
+    }
     """
     cs_code = """
-int time = 22;
-if (time < 10) 
-{
-  Console.WriteLine("Good morning.");
-} 
-
-
-else 
-{
-  Console.WriteLine("Good evening.");
-}
-
+    void foo(){
+        int time = 20;
+        if (time < 18) {
+          time=10;
+        }
+         else {
+          System.out.println("Good evening.");
+        }
+    }
     """
     js_code = """function foo(n) {
-if (time < 10) {
-  greeting = "Good morning";
-
-} 
-
-
-else {
-  greeting = "Good evening";
-}
-
+        if (time < 10) {
+          greeting = "Good morning";
+        } 
+        else {
+          greeting = "Good evening";
+        }
+    }
     """
     ruby_code = """
-x = 1
-if x > 2
-   puts "x is greater than 2"   
-else
-   puts "I can't guess the number"
-end
-
-        """
+    x = 1
+    if x > 2
+       puts "x is greater than 2"   
+    else
+       puts "I can't guess the number"
+    end
+    """
     go_code = """
-func main() {
-   /* local variable definition */
-   var a int = 100;
- 
-   /* check the boolean condition */
-   if( a < 20 ) {
-      /* if condition is true then print the following */
-      fmt.Printf("a is less than 20\n" );
-   } else {
-      /* if condition is false then print the following */
-      fmt.Printf("a is not less than 20\n" );
-   }
-   fmt.Printf("value of a is : %d\n", a);
-}
-        """
+    func main() {
+       /* local variable definition */
+       var a int = 100;
+     
+       /* check the boolean condition */
+       if( a < 20 ) {
+          /* if condition is true then print the following */
+          fmt.Printf("a is less than 20\n" );
+       } else {
+          /* if condition is false then print the following */
+          fmt.Printf("a is not less than 20\n" );
+       }
+       fmt.Printf("value of a is : %d\n", a);
+    }
+    """
     php_code = """
     <?php 
-$t = date("H");
-
-if ($t < "10") {
-  echo "Have a good morning!";
-}  else {
-  echo "Have a good night!";
-}
+    $t = date("H");
+    if ($t < "10") {
+      echo "Have a good morning!";
+    }  else {
+      echo "Have a good night!";
+    }
     ?> 
     """
     input_map = {
@@ -195,16 +186,19 @@ if ($t < "10") {
         "ruby": ("ruby", ruby_code),
         "go": ("go", go_code),
     }
+    code_directory = os.path.realpath(os.path.join(os.path.realpath(__file__), '../../../../'))
+    parser_path = os.path.join(code_directory, "parser/languages.so")
     for lang in ["java", "python", "js", "c", "cpp", "php", "go", "ruby", "cs"]:
-        # lang = "php"
         lang, code = input_map[lang]
-        blockswap = BlockSwap(
-            "/parser/languages.so", lang
+        no_transform = BlockSwap(
+            "/home/saikatc/HDD_4TB/NatGen/parser/languages.so", lang
         )
         print(lang)
-        # print("-" * 150)
-        # print(code)
-        # print("-" * 150)
-        code, meta = blockswap.transform_code(code)
-        print(meta["success"])
+        code, meta = no_transform.transform_code(code)
+        code = re.sub("[ \t\n]+", " ", code)
+        if lang == "python":
+            code = PythonProcessor.beautify_python_code(code.split())
+        print(code)
+        # print(re.sub("[ \t\n]+", " ", code))
+        print(meta)
         print("=" * 150)
