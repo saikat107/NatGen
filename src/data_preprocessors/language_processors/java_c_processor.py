@@ -154,8 +154,50 @@ class JavaAndCPPProcessor:
             update_tokens = []
             next_part_start += 1
         block_part = children[next_part_start]
-        block_tokens = get_tokens(code_string, block_part)
+        breaking_statements = cls.get_breaking_statements(block_part)
+        block_tokens = cls.get_tokens_insert_before(
+            code_string, block_part, " ".join(update_tokens), breaking_statements)
         return init_tokens, comp_tokens, update_tokens, block_tokens
+
+    @classmethod
+    def get_tokens_insert_before(cls, code_str, root, insertion_code, insert_before_node):
+        if not isinstance(insert_before_node, list):
+            insert_before_node = [insert_before_node]
+        if isinstance(code_str, str):
+            code_str = code_str.encode()
+        assert isinstance(root, Node)
+        tokens = []
+        if root.type == "comment":
+            return tokens
+        if "string" in str(root.type):
+            parent = root.parent
+            if len(parent.children) == 1:
+                return tokens
+            else:
+                return [code_str[root.start_byte:root.end_byte].decode()]
+        if root in insert_before_node:
+            tokens += insertion_code.split()
+        children = root.children
+        if len(children) == 0:
+            tokens.append(code_str[root.start_byte:root.end_byte].decode())
+        for child in children:
+            ts = cls.get_tokens_insert_before(code_str, child, insertion_code, insert_before_node)
+            tokens += ts
+        return tokens
+
+    @classmethod
+    def get_breaking_statements(cls, block):
+        breakings = ['continue_statement', 'break_statement', 'return_statement']
+        statements = []
+        stack = [block]
+        while len(stack) > 0:
+            top = stack.pop()
+            if str(top.type) in breakings:
+                statements.append(top)
+            else:
+                for child in top.children:
+                    stack.append(child)
+        return statements
 
     @classmethod
     def for_to_while(cls, code_string, root, fl, parser):
@@ -571,7 +613,6 @@ class JavaAndCPPProcessor:
         pre_expr = []
         post_expr = []
         queue = [root]
-
         while len(queue) > 0:
             current_node = queue[0]
             queue = queue[1:]

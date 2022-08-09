@@ -86,8 +86,22 @@ if __name__ == '__main__':
             int res = 0;
             for(i = 0; i < n; i++) {
                 int j = 0;
-                while (j < i){
-                    res += j; 
+                if (i == 0){
+                    foo(7);
+                    continue;
+                }
+                else if (res == 9) {
+                    bar(8);
+                    break;
+                }
+                else if (n == 0){
+                    tar(9);
+                    return 0;
+                }
+                else{
+                    foo();
+                    bar();
+                    tar();
                 }
             }
             return res;
@@ -98,9 +112,20 @@ if __name__ == '__main__':
     def is_prime(n):
         if n < 2:
             return False
-        for k in range(2, n - 1):
+        for k in range(2, n - 1, 7):
             if n % k == 0:
+                foo(7)
                 return False
+            elif k == 0:
+                bar(8)
+                continue
+            elif n == 9:
+                tar(9)
+                break
+            else:
+                foo()
+                bar()
+                tar()
         return True
     """
     c_code = """
@@ -117,25 +142,50 @@ if __name__ == '__main__':
     """
     cs_code = """
     int foo(int n){
-            int res = 0, i = 0;
-            while(i < n) {
-                int j = 0;
-                while (j < i){
-                    res += j; 
-                }
+        int res = 0, i = 0;
+        for(i = 0; i < n; i++) {
+            int j = 0;
+            if (i == 0){
+                foo(7);
+                continue;
             }
-            return res;
+            else if (res == 9) {
+                bar(8);
+                break;
+            }
+            else if (n == 0){
+                tar(9);
+                return 0;
+            }
+            else{
+                foo();
+                bar();
+                tar();
+            }
         }
+        return res;
+    }
     """
     js_code = """function foo(n) {
         let res = '';
         for(let i = 0; i < 10; i++){
-            res += i.toString();
-            res += '<br>';
+            if (i == 0){
+                res += i.toString();
+                continue;
+            }
+            else if (i == 1){
+                res += '<br>';
+                break;
+            }
+            else if (i == 2){
+                foo(i);
+                return 0;
+            }
+            else{
+                bar();
+                tar();
+            }
         } 
-        while ( i < 10 ; ) { 
-            res += 'bk'; 
-        }
         return res;
     }
     """
@@ -157,13 +207,25 @@ if __name__ == '__main__':
         """
     php_code = """
     <?php 
-    for ($x = 0; $x <= 10; $x++) {
-        echo "The number is: $x <br>";
-    }
-    $x = 0 ; 
-    while ( $x <= 10 ) { 
-        echo "The number is:  $x  <br> "; 
-        $x++; 
+    function foo(){
+        for ($x = 0; $x <= 10; $x++) {
+            if ($x == 0){
+                foo();
+                break;
+            }
+            elseif ($x == 1){
+                bar();
+                continue;
+            }
+            elseif ($x == 2){
+                tar();
+                return 0;
+            }
+            else{
+                xar();
+            }
+        }
+        return 4;
     } 
     ?> 
     """
@@ -188,5 +250,5 @@ if __name__ == '__main__':
         if lang == "python":
             code = PythonProcessor.beautify_python_code(code.split())
         print(code)
-        print(meta)
+        print(meta["success"])
         print("=" * 150)

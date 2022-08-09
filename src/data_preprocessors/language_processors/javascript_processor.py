@@ -43,6 +43,8 @@ class JavascriptProcessor:
 
     @classmethod
     def get_tokens_insert_before(cls, code_str, root, insertion_code, insert_before_node):
+        if not isinstance(insert_before_node, list):
+            insert_before_node = [insert_before_node]
         if isinstance(code_str, str):
             code_str = code_str.encode()
         assert isinstance(root, Node)
@@ -51,7 +53,7 @@ class JavascriptProcessor:
             return tokens
         if "string" in str(root.type):
             return [code_str[root.start_byte:root.end_byte].decode()]
-        if root == insert_before_node:
+        if root in insert_before_node:
             tokens += insertion_code.split()
         children = root.children
         if len(children) == 0 or str(root.type) in ["string"]:
@@ -80,6 +82,20 @@ class JavascriptProcessor:
                 ts = cls.get_tokens(code, child)
                 tokens += ts
         return tokens
+
+    @classmethod
+    def get_breaking_statements(cls, block):
+        breakings = ['continue_statement', 'break_statement', 'return_statement']
+        statements = []
+        stack = [block]
+        while len(stack) > 0:
+            top = stack.pop()
+            if str(top.type) in breakings:
+                statements.append(top)
+            else:
+                for child in top.children:
+                    stack.append(child)
+        return statements
 
     @classmethod
     def for_to_while_random(cls, code_string, parser):
@@ -163,7 +179,7 @@ class JavascriptProcessor:
             for child in children:
                 if child == for_node:
                     tokens.extend(
-                        init + ["while", "("] + cond + [")", "{"] + body + update + [";", "}"]
+                        init + ["while", "("] + cond + [")", "{"] + body + update + ["}"]
                     )
                 else:
                     tokens += cls.get_tokens_replace_for(code_str, for_node, child, init, cond, update, body)
@@ -177,14 +193,19 @@ class JavascriptProcessor:
         comparison = children[3]
         if str(comparison.type) != ";":
             comp_tokens = cls.get_tokens(code_string, comparison)
+            if comp_tokens[-1] == ";":
+                comp_tokens = comp_tokens[:-1]
             update = children[4]
             if str(update.type) == ")":
                 update_tokens = []
                 body = children[5]
             else:
-                update_tokens = cls.get_tokens(code_string, update)
+                update_tokens = cls.get_tokens(code_string, update) + [";"]
                 body = children[6]
-            body_tokens = cls.get_tokens(code_string, body)
+            # body_tokens = cls.get_tokens(code_string, body)
+            breaking_statements = cls.get_breaking_statements(body)
+            body_tokens = cls.get_tokens_insert_before(
+                code_string, body, " ".join(update_tokens), breaking_statements)
             if len(body_tokens) >= 2 and (body_tokens[0] == "{" and body_tokens[-1] == "}"):
                 body_tokens = body_tokens[1:-1]
             tokens = cls.get_tokens_replace_for(

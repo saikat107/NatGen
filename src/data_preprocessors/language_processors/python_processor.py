@@ -35,6 +35,8 @@ class PythonProcessor:
 
     @classmethod
     def get_tokens_insert_before(cls, code_str, root, insertion_code, insert_before_node):
+        if not isinstance(insert_before_node, list):
+            insert_before_node = [insert_before_node]
         if isinstance(code_str, str):
             code_str = code_str.encode()
         assert isinstance(root, Node)
@@ -47,7 +49,7 @@ class PythonProcessor:
                 return tokens
             else:
                 return [code_str[root.start_byte:root.end_byte].decode()]
-        if root == insert_before_node:
+        if root in insert_before_node:
             tokens += insertion_code.split()
         children = root.children
         if len(children) == 0:
@@ -241,10 +243,14 @@ class PythonProcessor:
                     stop = cls.get_tokens(code_string, args[1])
                     step = cls.get_tokens(code_string, args[2])
                 identifier_name = cls.get_tokens(code_string, identifier)[0]
+                terminal_statements = cls.find_terminal_statement(body_node)
+                body_tokens = cls.get_tokens_insert_before(
+                    code_string, body_node, " ".join([identifier_name, "+="] + step + ["NEWLINE"]), terminal_statements
+                )
                 while_stmt = [identifier_name, "="] + start + ["NEWLINE"] + \
                              ["while", identifier_name, "in", "list", "(", "range", "("] + stop + \
                              [")", ")", ":", "NEWLINE", "INDENT"] + \
-                             cls.get_tokens(code_string, body_node) + ["NEWLINE", identifier_name, "+="] + step + \
+                             body_tokens + ["NEWLINE", identifier_name, "+="] + step + \
                              ["DEDENT", "NEWLINE"]
                 tokens = cls.get_tokens_replace_for(
                     code_str=code_string,
@@ -257,6 +263,22 @@ class PythonProcessor:
         except:
             pass
         return root, code_string, False
+
+    @classmethod
+    def find_terminal_statement(cls, body_node):
+        statements = ['continue_statement', 'break_statement', 'return_statement']
+        terminals = []
+        stack = [body_node]
+        while len(stack) > 0:
+            top = stack.pop()
+            if str(top.type) in statements:
+                terminals.append(top)
+            else:
+                for child in top.children:
+                    stack.append(child)
+        return terminals
+
+        pass
 
     @classmethod
     def extract_while_loops(cls, root):
