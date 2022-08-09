@@ -16,7 +16,7 @@ class PythonProcessor:
         p = np.random.uniform(0, 1)
         control_variable = "_i_" + str(np.random.choice(list(range(10))))
         if p < 0.33:
-            return f"while FALSE : NEWLINE INDENT {body} NEWLINE DEDENT"
+            return f"while False : NEWLINE INDENT {body} NEWLINE DEDENT"
         elif p < 0.66:
             return f"while {control_variable} < {control_variable} : NEWLINE INDENT {body} NEWLINE DEDENT"
         else:
@@ -27,7 +27,7 @@ class PythonProcessor:
         p = np.random.uniform(0, 1)
         control_variable = "_i_" + str(np.random.choice(list(range(10))))
         if p < 0.33:
-            return f"if FALSE : NEWLINE INDENT {body} NEWLINE DEDENT"
+            return f"if False : NEWLINE INDENT {body} NEWLINE DEDENT"
         elif p < 0.66:
             return f"if {control_variable} < {control_variable} : NEWLINE INDENT {body} NEWLINE DEDENT"
         else:

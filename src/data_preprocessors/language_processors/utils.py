@@ -53,7 +53,7 @@ def count_nodes(root):
     return num_nodes
 
 
-def extract_statement_within_size(root, max_node=10, endswith=None):
+def extract_statement_within_size(root, max_node=10, endswith=None, code_string=None, tokenizer=None):
     if endswith is None:
         endswith = ["statement"]
     statements = []
@@ -62,8 +62,14 @@ def extract_statement_within_size(root, max_node=10, endswith=None):
         current_node = queue[0]
         queue = queue[1:]
         node_count = count_nodes(current_node)
-        if any(str(current_node.type).endswith(e) for e in endswith) and max_node > node_count > 1:
-            statements.append(current_node)
+        if code_string is not None and tokenizer is not None:
+            tokens = tokenizer(code_string, current_node)
+            current_code = " ".join(tokens).strip()
+        else:
+            current_code = "please provide code string and tokenizer to analyze code length"
+        if any(str(current_node.type).endswith(e) for e in endswith) and\
+                1 < node_count < max_node and len(current_code) > 0:
+                statements.append(current_node)
         for child in current_node.children:
             queue.append(child)
     return statements

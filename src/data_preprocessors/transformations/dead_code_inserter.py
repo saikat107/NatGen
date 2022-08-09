@@ -13,7 +13,8 @@ from src.data_preprocessors.language_processors import (
 )
 from src.data_preprocessors.language_processors.go_processor import GoProcessor
 from src.data_preprocessors.language_processors.ruby_processor import RubyProcessor
-from src.data_preprocessors.language_processors.utils import extract_statement_within_size, get_tokens, get_tokens_insert_before
+from src.data_preprocessors.language_processors.utils import extract_statement_within_size, get_tokens, \
+    get_tokens_insert_before, count_nodes
 from src.data_preprocessors.transformations import TransformationBase
 
 processor_function = {
@@ -68,19 +69,25 @@ class DeadCodeInserter(TransformationBase):
         self.tokenizer_function = tokenizer_function[self.language]
         self.insertion_function = insertion_function[self.language]
 
-    def insert_random_dead_code(self, code_string, max_node_in_statement=10):
+    def insert_random_dead_code(self, code_string, max_node_in_statement=-1):
         root = self.parse_code(code_string)
+        original_node_count = count_nodes(root)
+        if max_node_in_statement == -1:
+            max_node_in_statement = int(original_node_count / 2)
         if self.language == "ruby":
             statement_markers = ["assignment", "until", "call", "if", "for", "while"]
         else:
             statement_markers = None
-        statements = extract_statement_within_size(root, max_node_in_statement, statement_markers)
+        statements = extract_statement_within_size(
+            root, max_node_in_statement, statement_markers,
+            code_string=code_string, tokenizer=self.tokenizer_function,
+        )
         original_code = " ".join(self.tokenizer_function(code_string, root))
         try:
             while len(statements) > 0:
                 random_stmt, insert_before = np.random.choice(statements, 2)
                 statements.remove(random_stmt)
-                dead_coed_body = " ".join(self.tokenizer_function(code_string, random_stmt))
+                dead_coed_body = " ".join(self.tokenizer_function(code_string, random_stmt)).strip()
                 dead_code_function = np.random.choice(
                     [
                         self.processor.create_dead_for_loop,
@@ -100,13 +107,13 @@ class DeadCodeInserter(TransformationBase):
                     return modified_root, modified_code, True
         except:
             pass
-        return root, code_string, False
+        return root, original_code, False
 
     def transform_code(
             self,
             code: Union[str, bytes]
     ) -> Tuple[str, object]:
-        root, code, success = self.insert_random_dead_code(code, 30)
+        root, code, success = self.insert_random_dead_code(code, -1)
         code = re.sub("[ \n\t]+", " ", code)
         return code, {
             "success": success
@@ -128,15 +135,16 @@ if __name__ == '__main__':
         }
     }
     """
-    python_code = """def foo(n):
-    res = 0
-    for i in range(0, 19, 2):
-        res += i
-    i = 0
-    while i in range(n):
-        res += i
-        i += 1
-    return res
+    python_code = """
+    def foo(n):
+        res = 0
+        for i in range(0, 19, 2):
+            res += i
+        i = 0
+        while i in range(n):
+            res += i
+            i += 1
+        return res
     """
     c_code = """
         int foo(int n){
@@ -229,6 +237,8 @@ if __name__ == '__main__':
         )
         print(lang)
         code, meta = dead_code_inserter.transform_code(code)
-        print(re.sub("[ \t\n]+", " ", code))
+        if lang == "python":
+            code = PythonProcessor.beautify_python_code(code.split())
+        print(code)
         print(meta)
         print("=" * 150)
