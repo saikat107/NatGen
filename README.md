@@ -1,4 +1,4 @@
-## NatGen: Generative Pre-training by “Naturalizing” Source Code [[`paper`](https://dl.acm.org/doi/abs/10.1145/3540250.3549162], [[`slide`](https://docs.google.com/presentation/d/1T6kjiohAAR1YvcNvTASR94HptA3xHGCl/edit?usp=sharing&ouid=111755026725574085503&rtpof=true&sd=true)].
+## NatGen: Generative Pre-training by “Naturalizing” Source Code [[`paper`](https://dl.acm.org/doi/abs/10.1145/3540250.3549162)], [[`slide`](https://docs.google.com/presentation/d/1T6kjiohAAR1YvcNvTASR94HptA3xHGCl/edit?usp=sharing&ouid=111755026725574085503&rtpof=true&sd=true)].
 
 
 
