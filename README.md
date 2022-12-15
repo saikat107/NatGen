@@ -1,4 +1,6 @@
-## NatGen: Generative pre-training by “Naturalizing” source code
+## NatGen: Generative Pre-training by “Naturalizing” Source Code [[`Paper Link`]](https://dl.acm.org/doi/abs/10.1145/3540250.3549162),[[`Slide`]](https://docs.google.com/presentation/d/1T6kjiohAAR1YvcNvTASR94HptA3xHGCl/edit?usp=sharing&ouid=111755026725574085503&rtpof=true&sd=true).
+
+
 
 ### Getting Started
 
@@ -38,3 +40,24 @@ We reused source code from various open source code repositories
 1. [CodeT5](https://github.com/salesforce/CodeT5)
 2. [Microsoft CodeXGLUE](https://github.com/microsoft/CodeXGLUE)
 Out sincere thanks to the authors of these repositories for open-sourcing their work. 
+
+## Citation
+If you use  this repository, please cite,
+```
+@inproceedings{chakraborty2022natgen,
+    author = {Chakraborty, Saikat and Ahmed, Toufique and Ding, Yangruibo and Devanbu, Premkumar T. and Ray, Baishakhi},
+    title = {NatGen: Generative Pre-Training by “Naturalizing” Source Code},
+    year = {2022},
+    isbn = {9781450394130},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3540250.3549162},
+    doi = {10.1145/3540250.3549162},
+    booktitle = {Proceedings of the 30th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering},
+    pages = {18–30},
+    numpages = {13},
+    keywords = {Neural Network, Semantic Preserving Transformation, Source Code Transformer, Source Code Pre-training},
+    location = {Singapore, Singapore},
+    series = {ESEC/FSE 2022}
+}
+```
