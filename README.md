@@ -1,4 +1,4 @@
-# NatGen: Generative Pre-training by “Naturalizing” Source Code.
+# NatGen: Generative Pre-training by "Naturalizing" Source Code.
 
 <p align="center">
   <a href="https://github.com/saikat107/NatGen/issues-raw">
