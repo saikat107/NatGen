@@ -32,6 +32,8 @@
   <img src="https://img.shields.io/github/languages/count/saikat107/NatGen"/>
   &nbsp;
   <img src="https://img.shields.io/github/languages/top/saikat107/NatGen"/>
+  &nbsp;
+  <img src="https://img.shields.io/github/last-commit/saikat107/NatGen"/>
 </p>
 
 ### <p align="center">[The paper](https://dl.acm.org/doi/abs/10.1145/3540250.3549162) &emsp; [Slide Deck](https://docs.google.com/presentation/d/1T6kjiohAAR1YvcNvTASR94HptA3xHGCl/edit?usp=sharing&ouid=111755026725574085503&rtpof=true&sd=true)</p>
