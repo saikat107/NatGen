@@ -1,4 +1,7 @@
 # NatGen: Generative Pre-training by "Naturalizing" Source Code.
+Saikat Chakraborty, Toufique Ahmed, Yangruibo Ding, Premkumar T Devanbu, Baishakhi Ray. In Proceedings of the 30th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE ’22), November 14-18, 2022, Singapore, Singapore. ACM, New York, NY, USA, 13 pages. [https://doi.org/10.1145/3540250.3549162](https://doi.org/10.1145/3540250.3549162).
+
+<br/>
 
 <p align="center">
   <a href="https://github.com/saikat107/NatGen/issues-raw">
